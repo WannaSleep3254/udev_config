@@ -33,6 +33,8 @@ public:
         bytesize_t bytesize,     parity_t parity,
         stopbits_t stopbits
      );
+     
+    void read();
     
 private:
     serial::Serial ser;
@@ -64,6 +66,39 @@ IMU::IMU(    int argc, char** argv, ros::NodeHandle nh_,
 
     serial::Timeout to = serial::Timeout::simpleTimeout(1000);
     ser.setTimeout(to);
+}
+
+void IMU::read()
+{
+    size = 0;
+    size = ser.available();
+    buffer.clear();
+
+    if(size == 0)
+    {
+        return;
+    }
+    std::string read= ser.readline();
+
+    std::vector<std::string> words;
+    std::stringstream sstream(read);
+    std::istringstream isstream(read);
+    std::string word;
+
+    while(isstream>>word)
+    {
+        words.push_back(word);
+    }
+
+    if(words.size()!=9)
+        return;
+/*
+    for(int i=0; i<words.size(); i++)
+    {
+        std::cout<< std::stod(words[i] );
+    }
+    std::cout<<std::endl;
+*/
 }
 ```
 
