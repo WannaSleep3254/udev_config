@@ -3,6 +3,68 @@
 ## 시리얼 라이브러리
 [https://github.com/wjwwood/serial.git](https://github.com/wjwwood/serial.git)
 
+### CMakeLists.txt
+```Bash
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  serial
+)
+```
+### *.H
+```C++
+#ifndef IMU_NODE_H
+#define IMU_NODE_H
+
+#include <ros/ros.h>
+#include <serial/serial.h>
+
+#include <sensor_msgs/Imu.h>
+
+using namespace serial;
+
+namespace Magenta
+{
+
+class IMU
+{
+public:
+//  IMU(int argc, char** argv, ros::NodeHandle nh_);
+  IMU(  int argc, char** argv, ros::NodeHandle nh_,
+        const std::string &port, uint32_t baudrate,
+        bytesize_t bytesize,     parity_t parity,
+        stopbits_t stopbits
+     );
+    void setPort (const std::string &port);
+    void setBaudrate (uint32_t baudrate);
+    void setBytesize (bytesize_t bytesize);
+    void setParity (parity_t parity);
+    void setStopbits (stopbits_t stopbits);
+
+    bool open();
+    // run to 0xA1
+    void read();
+    void loop();
+
+private:
+    serial::Serial ser;
+    ros::NodeHandle nh;
+//  QTimer *loop_timer_;
+
+  ros::Publisher publisher_imu_;
+//  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscrber_cmd_;
+  sensor_msgs::Imu imu_msgs;
+
+  std::vector<uint8_t> buffer;
+  size_t size;// = 0;
+};
+
+}
+
+#endif
+```
+
+### *.CPP
+
 ## 파일경로
 ### Default rules
 ```Bash
