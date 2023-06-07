@@ -28,34 +28,18 @@ namespace Magenta
 class IMU
 {
 public:
-//  IMU(int argc, char** argv, ros::NodeHandle nh_);
   IMU(  int argc, char** argv, ros::NodeHandle nh_,
         const std::string &port, uint32_t baudrate,
         bytesize_t bytesize,     parity_t parity,
         stopbits_t stopbits
      );
-    void setPort (const std::string &port);
-    void setBaudrate (uint32_t baudrate);
-    void setBytesize (bytesize_t bytesize);
-    void setParity (parity_t parity);
-    void setStopbits (stopbits_t stopbits);
-
-    bool open();
-    // run to 0xA1
-    void read();
-    void loop();
-
+    
 private:
     serial::Serial ser;
     ros::NodeHandle nh;
-//  QTimer *loop_timer_;
 
-  ros::Publisher publisher_imu_;
-//  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscrber_cmd_;
-  sensor_msgs::Imu imu_msgs;
-
-  std::vector<uint8_t> buffer;
-  size_t size;// = 0;
+    std::vector<uint8_t> buffer;
+    size_t size;
 };
 
 }
@@ -64,6 +48,24 @@ private:
 ```
 
 ### *.CPP
+```C++
+IMU::IMU(    int argc, char** argv, ros::NodeHandle nh_,
+            const std::string &port, uint32_t baudrate,
+            bytesize_t bytesize,     parity_t parity,
+            stopbits_t stopbits)
+{
+   ros::init(argc, argv, "serial_control");
+    nh = nh_;
+    ser.setPort("/dev/imu");
+    ser.setBaudrate(115200);
+    ser.setBytesize(serial::eightbits);
+    ser.setParity(serial::parity_none);
+    ser.setStopbits(serial::stopbits_one);
+
+    serial::Timeout to = serial::Timeout::simpleTimeout(1000);
+    ser.setTimeout(to);
+}
+```
 
 ## 파일경로
 ### Default rules
